@@ -1,0 +1,5 @@
+requests==2.34.2
+python-dotenv
+beautifulsoup4
+sentence-transformers
+chromadb
