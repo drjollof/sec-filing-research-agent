@@ -30,6 +30,8 @@ SEC_REQUESTS_PER_SECOND = 8
 
 TARGET_FORMS = {"10-K", "10-Q"}
 
+OPENROUTER_MODEL = "openrouter/free"
+
 
 COMPANIES = {
     "AAPL": {
