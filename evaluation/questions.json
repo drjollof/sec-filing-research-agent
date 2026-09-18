@@ -1,0 +1,122 @@
+[
+  {
+    "id": "Q01",
+    "question": "What were Apple's total net sales in 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": "revenue",
+    "expected_support": "company_facts",
+    "expected_sections": ["Item 8"]
+  },
+  {
+    "id": "Q02",
+    "question": "What risks does Apple identify related to its business and operations?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "narrative",
+    "expected_metric": null,
+    "expected_support": "retrieval",
+    "expected_sections": ["Item 1A"]
+  },
+  {
+    "id": "Q03",
+    "question": "What products and services does Apple offer?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "narrative",
+    "expected_metric": null,
+    "expected_support": "retrieval",
+    "expected_sections": ["Item 1"]
+  },
+  {
+    "id": "Q04",
+    "question": "How did Apple's business perform in China?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "narrative",
+    "expected_metric": null,
+    "expected_support": "retrieval",
+    "expected_sections": ["Item 7"]
+  },
+  {
+    "id": "Q05",
+    "question": "What was Apple's total assets at the end of 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": "total_assets",
+    "expected_support": "company_facts",
+    "expected_sections": ["Item 8"]
+  },
+  {
+    "id": "Q06",
+    "question": "What was Apple's cash balance at the end of 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": "cash",
+    "expected_support": "company_facts",
+    "expected_sections": ["Item 8"]
+  },
+  {
+    "id": "Q07",
+    "question": "What was Apple's net income in 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": "net_income",
+    "expected_support": "company_facts",
+    "expected_sections": ["Item 8"]
+  },
+  {
+    "id": "Q08",
+    "question": "Why did Apple's revenue change in 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "narrative",
+    "expected_metric": null,
+    "expected_support": "retrieval",
+    "expected_sections": ["Item 7"]
+  },
+  {
+    "id": "Q09",
+    "question": "What was Apple's revenue in 2025, and why did it change?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "hybrid",
+    "expected_metric": "revenue",
+    "expected_support": "company_facts_and_retrieval",
+    "expected_sections": ["Item 7", "Item 8"]
+  },
+  {
+    "id": "Q10",
+    "question": "What was Apple's free cash flow in 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": null,
+    "expected_support": "unsupported",
+    "expected_sections": []
+  },
+  {
+    "id": "Q11",
+    "question": "How much did Apple spend on research and development in 2025?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "numeric",
+    "expected_metric": null,
+    "expected_support": "unsupported",
+    "expected_sections": ["Item 8"]
+  },
+  {
+    "id": "Q12",
+    "question": "What competitive risks does Apple discuss?",
+    "ticker": "AAPL",
+    "fiscal_year": 2025,
+    "expected_route": "narrative",
+    "expected_metric": null,
+    "expected_support": "retrieval",
+    "expected_sections": ["Item 1A"]
+  }
+]

@@ -1,8 +1,11 @@
 import re
+
 from dataclasses import dataclass, field
 
 from src.agent.claim_extractor import Claim, ClaimExtractor
+
 from src.agent.evidence import Evidence
+
 from src.agent.narrative_verifier import NarrativeVerifier
 
 
@@ -21,6 +24,7 @@ class VerificationResult:
 
 
 class EvidenceVerifier:
+
     EVIDENCE_ID_PATTERN = re.compile(
         r"(?:\[|【|\()E(\d+)(?:\]|】|\))"
     )
@@ -30,6 +34,7 @@ class EvidenceVerifier:
         (?:
             \$\s*
             (?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)
+            (?:\.\d+)?
             \s*
             (?:trillion|billion|million|thousand)?
         )
@@ -38,6 +43,12 @@ class EvidenceVerifier:
             (?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)
             \s*
             (?:trillion|billion|million|thousand)
+        )
+        |
+        (?:
+            (?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)
+            \s*
+            USD
         )
         |
         (?:
@@ -77,6 +88,7 @@ class EvidenceVerifier:
         )
 
         for claim in claims:
+
             if claim.claim_type == "numeric":
                 issues.extend(
                     self._verify_numeric_claim(
@@ -110,6 +122,7 @@ class EvidenceVerifier:
 
         for claim in claims:
             for evidence_id in claim.evidence_ids:
+
                 if evidence_id not in cited_ids:
                     cited_ids.append(evidence_id)
 
@@ -124,6 +137,7 @@ class EvidenceVerifier:
         issues = []
 
         for evidence_id in cited_ids:
+
             if evidence_id not in evidence_map:
                 issues.append(
                     VerificationIssue(
@@ -152,12 +166,13 @@ class EvidenceVerifier:
         )
 
         for number_text in unsupported_numbers:
+
             issues.append(
                 VerificationIssue(
                     issue_type="unsupported_numeric_claim",
                     message=(
-                        f"Numeric claim '{number_text}' could not "
-                        "be matched to cited structured evidence."
+                        f"Numeric claim '{number_text}' "
+                        "could not be matched to cited evidence."
                     ),
                 )
             )
@@ -204,10 +219,13 @@ class EvidenceVerifier:
         for match in self.NUMERIC_CLAIM_PATTERN.finditer(
             claim.text
         ):
+
             number_text = match.group(0).strip()
 
-            # Ignore 4-digit years from being treated as numeric claims
-            if re.fullmatch(r"(19|20)\d{2}", number_text):
+            if re.fullmatch(
+                r"(19|20)\d{2}",
+                number_text,
+            ):
                 continue
 
             parsed_value = self._parse_number(
@@ -220,24 +238,15 @@ class EvidenceVerifier:
             matched = False
 
             for evidence_id in claim.evidence_ids:
+
                 evidence = evidence_map.get(evidence_id)
 
                 if evidence is None:
                     continue
 
-                if evidence.source_type != "company_facts":
-                    continue
-
-                evidence_value = evidence.provenance.get(
-                    "value"
-                )
-
-                if evidence_value is None:
-                    continue
-
-                if self._values_match(
+                if self._number_is_supported(
                     parsed_value,
-                    float(evidence_value),
+                    evidence,
                 ):
                     matched = True
                     break
@@ -247,17 +256,85 @@ class EvidenceVerifier:
 
         return unsupported
 
+    def _number_is_supported(
+        self,
+        claimed_value: float,
+        evidence: Evidence,
+    ) -> bool:
+
+        if evidence.source_type == "company_facts":
+
+            evidence_value = evidence.provenance.get(
+                "value"
+            )
+
+            if evidence_value is None:
+                return False
+
+            return self._values_match(
+                claimed_value,
+                float(evidence_value),
+            )
+
+        if evidence.source_type == "filing_chunk":
+
+            return self._value_appears_in_filing_evidence(
+                claimed_value,
+                evidence,
+            )
+
+        return False
+
+    def _value_appears_in_filing_evidence(
+        self,
+        claimed_value: float,
+        evidence: Evidence,
+    ) -> bool:
+
+        text = evidence.content or ""
+
+        for match in self.NUMERIC_CLAIM_PATTERN.finditer(
+            text
+        ):
+
+            evidence_number_text = match.group(0).strip()
+
+            if re.fullmatch(
+                r"(19|20)\d{2}",
+                evidence_number_text,
+            ):
+                continue
+
+            evidence_value = self._parse_number(
+                evidence_number_text
+            )
+
+            if evidence_value is None:
+                continue
+
+            if self._values_match(
+                claimed_value,
+                evidence_value,
+            ):
+                return True
+
+        return False
+
     @staticmethod
     def _parse_number(
         number_text: str,
     ) -> float | None:
 
         normalized = (
-            number_text.lower()
+            number_text
+            .lower()
             .replace("$", "")
             .replace(",", "")
             .strip()
         )
+
+        if normalized.endswith("usd"):
+            normalized = normalized[:-3].strip()
 
         if normalized.endswith("%"):
             normalized = normalized[:-1].strip()
@@ -272,11 +349,15 @@ class EvidenceVerifier:
         multiplier = 1
 
         for word, value in multipliers.items():
+
             if normalized.endswith(word):
+
                 multiplier = value
+
                 normalized = normalized[
                     :-len(word)
                 ].strip()
+
                 break
 
         try:

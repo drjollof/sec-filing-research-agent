@@ -16,8 +16,8 @@ class ClaimExtractor:
     """
 
     EVIDENCE_ID_PATTERN = re.compile(
-        r"(?:\[|【|\()E(\d+)(?:\]|】|\))", 
-        re.IGNORECASE
+        r"(?:\[|【|\()E(\d+)(?:\]|】|\))",
+        re.IGNORECASE,
     )
 
     NUMERIC_CLAIM_PATTERN = re.compile(
@@ -37,6 +37,12 @@ class ClaimExtractor:
         )
         |
         (?:
+            (?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)
+            \s*
+            USD
+        )
+        |
+        (?:
             \d+(?:\.\d+)?
             \s*%
         )
@@ -49,7 +55,6 @@ class ClaimExtractor:
             return []
 
         claims = []
-
 
         for block in self._split_blocks(answer):
             block = block.strip()
@@ -65,6 +70,7 @@ class ClaimExtractor:
 
             if not claim_text:
                 continue
+
             claim_type = self._determine_type(claim_text)
 
             claims.append(
@@ -78,37 +84,53 @@ class ClaimExtractor:
         return claims
 
     def _split_blocks(self, text: str) -> list[str]:
+        text = "\n".join(line.strip() for line in text.splitlines())
+
+        text = re.sub(
+            r"([.!?])((?:\s*(?:\[|【|\()E\d+(?:\]|】|\)))+)",
+            lambda m: m.group(2) + m.group(1),
+            text
+        )
+
+    
         return [
-            block.strip()
-            for block in re.split(r"\n+", text)
-            if block.strip()
+            sentence.strip()
+            for sentence in re.split(r"(?<=[.!?])\s+|\n+", text)
+            if sentence.strip()
         ]
 
     def _clean_text(self, text: str) -> str:
         text = self.EVIDENCE_ID_PATTERN.sub("", text)
-        text = re.sub(r"[\*|#-]", "", text)
+        text = re.sub(r"[*#-]", "", text)
         return re.sub(r"\s+", " ", text).strip()
 
     def _extract_evidence_ids(self, text: str) -> list[str]:
         matches = self.EVIDENCE_ID_PATTERN.findall(text)
+
         seen = set()
         ids = []
-        for m in matches:
-            eid = f"E{m}"
-            if eid not in seen:
-                seen.add(eid)
-                ids.append(eid)
+
+        for match in matches:
+            evidence_id = f"E{match}"
+
+            if evidence_id not in seen:
+                seen.add(evidence_id)
+                ids.append(evidence_id)
+
         return ids
 
     def _determine_type(self, text: str) -> str:
         for match in self.NUMERIC_CLAIM_PATTERN.finditer(text):
-            val = match.group(0).strip()
-            if not re.fullmatch(r"(19|20)\d{2}", val):
+            value = match.group(0).strip()
+
+            if not re.fullmatch(r"(19|20)\d{2}", value):
                 return "numeric"
+
         return "narrative"
 
     def _is_framing_noise(self, text: str) -> bool:
         normalized = text.lower().replace(" ", "")
+
         noise_phrases = [
             "basedontheprovidedevidence",
             "accordingtothefiling",
@@ -118,12 +140,15 @@ class ClaimExtractor:
             "appleidentifiesthefollowing",
             "thefollowingrisks",
         ]
-        
+
         for phrase in noise_phrases:
             if phrase in normalized and len(normalized) < len(phrase) + 15:
                 return True
-                
-        if len(text.split()) < 8 and not self.EVIDENCE_ID_PATTERN.search(text):
+
+        
+        if len(text.split()) < 5 and not self.EVIDENCE_ID_PATTERN.search(text):
+            if self.NUMERIC_CLAIM_PATTERN.search(text):
+                return False
             return True
-            
+
         return False
