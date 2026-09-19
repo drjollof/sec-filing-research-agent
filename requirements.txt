@@ -4,3 +4,8 @@ beautifulsoup4
 sentence-transformers
 chromadb
 openai
+SQLAlchemy
+fastapi
+uvicorn
+httpx
+pydantic
