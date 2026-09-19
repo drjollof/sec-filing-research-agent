@@ -8,8 +8,9 @@ An auditable, hallucination-resistant Retrieval-Augmented Generation (RAG) syste
 Built on a core engineering principle: **The LLM should synthesize evidence, not invent it.**
 
 ### Live Deployment
+* **Streamlit Web App:** [Launch App](https://sec-filing-agent.streamlit.app/)
 
-* **Interactive Docs (Swagger):** [Try it Out](https://sec-filing-research-agent-399390869297.europe-west1.run.app/docs)
+* **Interactive Docs (Swagger):** [View API](https://sec-filing-research-agent-399390869297.europe-west1.run.app/docs)
 
 ---
 
@@ -94,7 +95,7 @@ The system maintained high faithfulness and completeness across multiple distinc
 
 ## Local Development
 
-1. **Clone and Install:**
+**Clone and Install:**
 ```bash
 git clone https://github.com/YOUR_USERNAME/sec-filing-research-agent.git
 cd sec-filing-research-agent
@@ -103,16 +104,20 @@ source .venv/bin/activate  # Or .\.venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-2. **Environment Variables:** Create a `.env` file:
+**Environment Variables:** Create a `.env` file:
 ```text
 SEC_USER_AGENT="Your Name your.email@example.com"
 OPENROUTER_API_KEY="sk-or-v1-..."
 # DATABASE_URL="postgresql+psycopg://..." # Optional: Defaults to local SQLite if omitted
 ```
 
-3. **Run the API:**
+**Run the API:**
 ```bash
 uvicorn src.api.main:app --reload
+```
+**Run Streamlit App**
+```bash
+streamlit run app.py
 ```
 
 ---
