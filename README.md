@@ -27,7 +27,7 @@ This project utilizes an **Explicit Agent Orchestrator** (built from scratch, wi
 * **AI / ML:** OpenRouter/free , Sentence Transformers (`all-MiniLM-L6-v2`)
 * **Vector Database:** ChromaDB
 * **Relational Database:** PostgreSQL (Neon Serverless), SQLite (Local), SQLAlchemy ORM
-* **Deployment:** Docker, Google Cloud Build, Google Cloud Run
+* **Deployment:** Docker, Google Cloud Build, Google Cloud Run, Streamlit
 * **Data Sources:** SEC EDGAR (Flat-DOM parsed HTML), SEC XBRL API
 
 ---
@@ -110,12 +110,16 @@ SEC_USER_AGENT="Your Name your.email@example.com"
 OPENROUTER_API_KEY="sk-or-v1-..."
 # DATABASE_URL="postgresql+psycopg://..." # Optional: Defaults to local SQLite if omitted
 ```
+**Ingest and Rebuild Vector Database:**
+```bash
+python src/ingestion/run_ingestion.py
+```
 
 **Run the API:**
 ```bash
 uvicorn src.api.main:app --reload
 ```
-**Run Streamlit App**
+**Run Streamlit App:**
 ```bash
 streamlit run app.py
 ```
